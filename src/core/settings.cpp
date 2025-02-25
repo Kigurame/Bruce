@@ -188,6 +188,7 @@ void setUIColor(){
   };
 
   if (idx == 9) options.push_back({"Custom Theme", [=]() { backToMenu(); }, true});
+  options.push_back({"Invert Color", [=]() { bruceConfig.setColorInverted(!bruceConfig.colorInverted); tft.invertDisplay(bruceConfig.colorInverted); }, bruceConfig.colorInverted});
   options.push_back({"Main Menu", [=]() { backToMenu(); }});
 
   loopOptions(options, idx);
@@ -422,7 +423,6 @@ void runClockLoop() {
 
   // Delay due to SelPress() detected on run
   tft.fillScreen(bruceConfig.bgColor);
-  tft.fillScreen(bruceConfig.bgColor);
   delay(300);
 
   for (;;){
@@ -492,6 +492,27 @@ int gsetIrTxPin(bool set){
   return bruceConfig.irTx;
 }
 
+void setIrTxRepeats() {
+  uint8_t chRpts = 0; // Chosen Repeats
+
+  options = {
+    {"None",                        [&]() { chRpts = 0; }},
+    {"5  (+ 1 initial)",            [&]() { chRpts = 5; }},
+    {"10 (+ 1 initial)",            [&]() { chRpts = 10; }},
+    {"Custom",        [&]() {
+      // up to 99 repeats
+      String rpt = keyboard(String(bruceConfig.irTxRepeats), 2, "Nbr of Repeats (+ 1 initial)");
+      chRpts = static_cast<uint8_t>(rpt.toInt());
+    }},
+    {"Main Menu",     [=]() { backToMenu(); }},
+  };
+
+  loopOptions(options);
+
+  if (returnToMenu) return;
+  
+  bruceConfig.setIrTxRepeats(chRpts);
+}
 /*********************************************************************
 **  Function: gsetIrRxPin
 **  get or set IR Rx Pin

@@ -10,6 +10,11 @@
 
 #define DEFAULT_PRICOLOR 0xA80F
 
+#ifdef TFT_INVERSION_ON
+#define COLOR_INVERTED 1
+#else
+#define COLOR_INVERTED 0
+#endif
 enum RFIDModules {
     M5_RFID2_MODULE  = 0,
     PN532_I2C_MODULE = 1,
@@ -66,6 +71,7 @@ public:
 
     // IR
     int irTx = LED;
+    uint8_t irTxRepeats = 0;
     int irRx = GROVE_SCL;
 
     // RF
@@ -87,6 +93,7 @@ public:
     String startupApp = "";
     String wigleBasicToken = "";
     int devMode = 0;
+    int colorInverted = COLOR_INVERTED;
 
     std::vector<String> disabledMenus = {};
 
@@ -113,7 +120,7 @@ public:
 
     // Theme
     void setTheme(uint16_t primary, uint16_t secondary = NULL, uint16_t background = NULL);
-    void validateTheme();
+    // void validateTheme();
 
     // Settings
     void setRotation(int value);
@@ -148,6 +155,7 @@ public:
 
     // IR
     void setIrTxPin(int value);
+    void setIrTxRepeats(uint8_t value);
     void setIrRxPin(int value);
 
     // RF
@@ -175,6 +183,8 @@ public:
     void setWigleBasicToken(String value);
     void setDevMode(int value);
     void validateDevModeValue();
+    void setColorInverted(int value);
+    void validateColorInverted();
     void addDisabledMenu(String value);
     // TODO: removeDisabledMenu(String value);
 };
