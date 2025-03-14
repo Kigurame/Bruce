@@ -48,14 +48,13 @@ void key_input_ble(FS fs, String bad_script) {
       char ArgChar;
       bool ArgIsCmd;  // Verifies if the Argument is DELETE, TAB or F1-F12
       int cmdFail;    // Verifies if the command is supported, mus pass through 2 if else statemens and summ 2 to not be supported
-      int line;       // Shows 3 commands of the payload on screen to follow the execution
+                      // Shows 3 commands of the payload on screen to follow the execution
 
 
       Kble.releaseAll();
       tft.setTextSize(1);
       tft.setCursor(0, 0);
       tft.fillScreen(bruceConfig.bgColor);
-      line = 0;
 
       while (payloadFile.available()) {
         if(check(SelPress)) {
@@ -392,10 +391,13 @@ Reconnect:
     tft.setTextSize(FM);
     String _mymsg="";
     keyStroke key;
+    long debounce;
     while(Kble.isConnected()) {
       key=_getKeyPress();
-      if (key.pressed) {
-        if(key.enter) Kble.println();
+      if (key.pressed && (millis()-debounce>200)) {
+        if(key.alt) Kble.press(KEY_LEFT_ALT);
+        if(key.ctrl) Kble.press(KEY_LEFT_CTRL);
+        if(key.gui) Kble.press(KEY_LEFT_GUI);
         else if(key.del) Kble.press(KEYBACKSPACE);
         else {
           for(char k : key.word) {
@@ -426,7 +428,7 @@ Reconnect:
           tft.drawCentreString("Pressed: " + keyStr, tftWidth / 2, tftHeight / 2,1);
           _mymsg=keyStr;
         }
-        delay(200);
+        debounce = millis();
       }
     }
     if(BLEConnected && !Kble.isConnected()) goto Reconnect;

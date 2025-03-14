@@ -24,12 +24,13 @@ void ConfigMenu::optionsMenu() {
         {"Network Creds", [=]() { setNetworkCredsMenu(); }},
         {"Clock",         [=]() { setClock(); }},
         {"Sleep",         [=]() { setSleepMode(); }},
+        {"Factory Reset", [=]() { bruceConfig.factoryReset(); }},
         {"Restart",       [=]() { ESP.restart(); }},
     };
 
 #if defined(T_EMBED_1101)
-    options.emplace_back("Turn-off", [=]() { powerOff(); });
-    options.emplace_back("DeepSleep", [=]() { digitalWrite(PIN_POWER_ON,LOW); esp_sleep_enable_ext0_wakeup(GPIO_NUM_6,LOW); esp_deep_sleep_start(); });
+    options.emplace_back("Turn-off",   [=]() { powerOff(); });
+    options.emplace_back("Deep Sleep", [=]() { digitalWrite(PIN_POWER_ON,LOW); esp_sleep_enable_ext0_wakeup(GPIO_NUM_6,LOW); esp_deep_sleep_start(); });
 #elif defined(T_DISPLAY_S3)
     options.emplace_back("Turn-off", [=]()
     {
@@ -37,11 +38,12 @@ void ConfigMenu::optionsMenu() {
         digitalWrite(PIN_POWER_ON, LOW);
         digitalWrite(TFT_BL, LOW);
         tft.writecommand(0x10);
-        esp_deep_sleep_start(); 
+        esp_deep_sleep_start();
     });
 #endif
     if (bruceConfig.devMode) options.emplace_back("Dev Mode", [=]() { devMenu(); });
 
+    options.emplace_back("About",     [=]() { showDeviceInfo(); });
     options.emplace_back("Main Menu", [=]() { backToMenu(); });
 
     loopOptions(options,false,true,"Config");
@@ -49,9 +51,10 @@ void ConfigMenu::optionsMenu() {
 
 void ConfigMenu::devMenu(){
     options = {
-        {"Device Info",   [=]() { showDeviceInfo(); }},
-        {"MAC Address",   [=]() { checkMAC(); }},
         {"I2C Finder",    [=]() { find_i2c_addresses(); }},
+        {"CC1101 Pins",   [=]() { setSPIPinsMenu(bruceConfig.CC1101_bus); }},
+        {"NRF24  Pins",   [=]() { setSPIPinsMenu(bruceConfig.NRF24_bus); }},
+        {"SDCard Pins",   [=]() { setSPIPinsMenu(bruceConfig.SDCARD_bus); }},
         {"Back",          [=]() { optionsMenu(); }},
     };
 
